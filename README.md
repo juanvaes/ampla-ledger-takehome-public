@@ -135,10 +135,39 @@ requirements are `click` and it's dependencies.
 Run `python cli.py` for a list of commands and helpful output.
 
 #### Testing the CLI
-
 Run `python -m unittest tests.test_cli` for testing the command line. All test cases should pass if balances is
 implemented correctly. NOTE: With the given starter code you will pass 3 out of 16 tests out of the box. Please use
 the test suite to gauge your precision and accuracy. There are 13 tests for `balances`.
+
+
+-----
+### Advance Calculator
+To calculate the overall_advance_balance, overall_interest_payable_balance, overall_interest_paid, overall_payments_for_future we have created 
+a class called `AdvanceCalculator` and you can find it inside the `advances.py` module. This class has attributes and methods that helps finding the balance for the revolving line of credit. Notice
+we also convert each tuple event into an `Event` instance (see the `event.py` module) to add more attributes (metadata) to a specified event.
+
+An `AdvanceCalculator` instance is created in the `cli.py` module after we import the events iterable, then we delegate to it to find the values mentioned above. 
+
+#### Algorithm Strategy
+Return the summary of the revolving line of credit, that is returning information
+of the 'overall_advance_balance', 'overall_interest_payable_balance', 'overall_interest_paid' and
+'overall_payments_for_future'.
+
+##### Notes:
+- The strategy chosen is to always pick the current_event and the next_event and then we *proccess* the current event. The 'self.process_events' method decides what to do.
+- The happy path is when the end_date matches the last event of the events iterable, in this case we *process* the penultimate event within the while loop, the last_event is processed out of this loop.
+- There is case when end_date is greater than the last_event, in this case we just also *process* al the events normally, the last_event is executed out of while loop but the difference is that we also calculate the accrued interests until the end_date.
+- What do we do when end_date is in-between the events list?
+   1. Within the main while loop we just detect if we have reached end_date, then we break the execution of the while loop.
+   2. After that we want to see if the event date is different to the next_event date (next_event.date not touches end_date), if that is true, we just process the event normally.
+   3. If they (event.date, next_event.date) are equal we may want 'iteratively' to look for a following event of the next_event (we call it future event) because there could be one or several events with the same end_date.
+   
+   We just basically continue to process events until we find two events that are differents (end_date surpassed), then we break the execution and process the last_event.
+
+#### Testing the Advance Calculator
+Run `python -m unittest tests.test_advances` for testing the advance calculator. There are 29 tests that are currently built to test the functionality.
+
+-----
 
 ## Example
 
